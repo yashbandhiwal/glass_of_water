@@ -7,14 +7,14 @@ const cors = require('cors');
 const errorHandler = require('./middleware/error');
 const connectDB = require('./config/db');
 
-// Load env vars
+// load env vars
 dotenv.config({ path: './config/config.env' });
 
 // Connect to database
 connectDB();
 
 // Route files
-
+const auth = require('./routes/auth');
 
 const app = express();
 
@@ -33,7 +33,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
-
+app.use('/api/v1/auth',auth);
 
 app.use(errorHandler);
 
