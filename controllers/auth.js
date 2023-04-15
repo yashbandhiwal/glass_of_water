@@ -37,7 +37,7 @@ exports.register = asyncHandler(async(req,res,next) => {
 
 /**
  * @desc    Login User
- * @route   /api/v1/auth/login
+ * @route   POST /api/v1/auth/login
  * @access  Public
  * @Note
  */
@@ -69,7 +69,7 @@ exports.login = asyncHandler(async(req,res,next) => {
 
 /**
  * @desc    Get Detail
- * @route   /api/v1/auth/getme
+ * @route   GET /api/v1/auth/getme
  * @access  Private
  * @Note
  */
@@ -86,7 +86,7 @@ exports.getme = asyncHandler(async(req,res,next) => {
 
 /**
  * @desc    Logout
- * @route   /api/v1/auth/logout
+ * @route   GET /api/v1/auth/logout
  * @access  Public
  * @Note
  */
@@ -103,7 +103,7 @@ exports.logout = asyncHandler(async(req,res,next) => {
 
 /**
  * @desc    Update Detail
- * @route   /api/v1/auth/updateDetail
+ * @route   PUT /api/v1/auth/updateDetail
  * @access  Private
  * @note
  */
@@ -136,6 +136,81 @@ exports.updateDetail = asyncHandler(async(req,res,next) => {
     })
 
 })
+
+
+/**
+ * @desc    Update Password
+ * @route   PUT /api/v1/auth/updatePassword
+ * @access  Private
+ * @note
+ */
+exports.updatePassword = asyncHandler(async(req,res,next) => {
+
+    const user = await User.findById(req.user.id).select('+password')
+
+    if(!(await user.matchPassword(req.body.current))){
+        return next(new ErrorResponse('Password is Incorrect',401))
+    }
+
+    user.password = req.body.new;
+    await user.save()
+
+    sendTokenResponse(user, 200, res)
+
+})
+
+
+/**
+ * @desc    Forget Password
+ * @route   POST /api/v1/auth/forgetPassword
+ * @access  Public
+ * @Note    
+ */
+exports.forgetPassword = asyncHandler(async(req,res,next) => {
+    
+    let user = await User.findOne({
+        $or:[
+            {userName:req.body.userName},
+            {email:req.body.email}
+        ]
+    })
+
+    if (!user) {
+        return next(new ErrorResponse('There is no user with that email or username', 404));
+    }
+
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset url
+    const resetUrl = `${req.protocol}://${req.get(
+        'host'
+    )}/api/v1/auth/resetpassword/${resetToken}`;
+
+    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+    try {
+        // await sendEmail({
+        //   email: user.email,
+        //   subject: 'Password reset token',
+        //   message
+        // });
+    
+        res.status(200).json({ success: true, message,data: 'Email sent' });
+    } catch (err) {
+        console.log(err);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        return next(new ErrorResponse('Email could not be sent', 500));
+    }
+
+})
+
 
 /**
  * token from model
