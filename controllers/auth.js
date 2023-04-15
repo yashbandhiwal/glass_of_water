@@ -84,6 +84,23 @@ exports.getme = asyncHandler(async(req,res,next) => {
 
 
 /**
+ * @desc    Logout
+ * @route   /api/v1/auth/logout
+ * @access  Public
+ * @Note
+ */
+exports.logout = asyncHandler(async(req,res,next) => {
+
+    res.status(200).json({
+        success:true,
+        message:"Successfully Logout",
+        body:{}
+    })
+
+})
+
+
+/**
  * token from model
  * create cookie
  * send response
