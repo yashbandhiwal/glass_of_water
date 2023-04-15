@@ -33,6 +33,56 @@ exports.register = asyncHandler(async(req,res,next) => {
     sendTokenResponse(user, 200, res);
 })
 
+
+/**
+ * @desc    Login User
+ * @route   /api/v1/auth/login
+ * @access  Public
+ * @Note
+ */
+exports.login = asyncHandler(async(req,res,next) => {
+    const { userName, password } = req.body;
+
+    // Validate emil & password
+    if (!userName || !password) {
+        return next(new ErrorResponse('Please provide an username and password', 400));
+    }
+
+    // Check for user
+    const user = await User.findOne({ userName }).select('+password');
+
+    if (!user) {
+        return next(new ErrorResponse('Invalid credentials', 401));
+    }
+
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+        return next(new ErrorResponse('Invalid credentials', 401));
+    }
+
+    sendTokenResponse(user, 200, res);
+})
+
+
+/**
+ * @desc    Get Detail
+ * @route   /api/v1/auth/getme
+ * @access  Private
+ * @Note
+ */
+exports.getme = asyncHandler(async(req,res,next) => {
+
+    const user = await User.findById(req.user.id).lean().exec()
+
+    res.status(200).json({
+        success:true,
+        body:user
+    })
+})
+
+
 /**
  * token from model
  * create cookie
@@ -54,10 +104,10 @@ const sendTokenResponse = (user, statusCode, res) => {
     }
 
     res
-        .status(statusCode)
-        .cookie('token', token, options)
-        .json({
-            success: true,
-            token
-        });
+    .status(statusCode)
+    .cookie('token', token, options)
+    .json({
+        success: true,
+        token
+    });
 }
