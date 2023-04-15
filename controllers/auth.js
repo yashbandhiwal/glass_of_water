@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
+const { ObjectId } = require('mongodb');
 
 
 /**
@@ -99,6 +100,42 @@ exports.logout = asyncHandler(async(req,res,next) => {
 
 })
 
+
+/**
+ * @desc    Update Detail
+ * @route   /api/v1/auth/updateDetail
+ * @access  Private
+ * @note
+ */
+exports.updateDetail = asyncHandler(async(req,res,next) => {
+
+    let {
+        name,
+        avatar,
+        emoji
+    } = req.body
+
+    let user = await User.findByIdAndUpdate({_id:new ObjectId(req.user.id)},{
+        $set:{
+            name,
+            avatar,
+            emoji
+        }
+    },
+    {
+        new:true,
+        runValidators:true,
+        returnNewDocument : true  
+    })
+
+
+    res.status(200).json({
+        success:true,
+        message:"Successfully Updated",
+        body:user
+    })
+
+})
 
 /**
  * token from model

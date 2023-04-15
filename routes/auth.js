@@ -4,7 +4,8 @@ const {
     register,
     login,
     getme,
-    logout
+    logout,
+    updateDetail
 } = require('../controllers/auth');
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.post('/register',register);
 router.post('/login',login);
 router.get('/getme',protect,getme);
 router.get('/logout',logout);
+router.put('/updateDetail',protect,updateDetail);
 
 module.exports = router;
