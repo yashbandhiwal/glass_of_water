@@ -117,3 +117,55 @@ exports.deleteGlass = asyncHandler(async(req,res,next) => {
         body:{}
     })
 })
+
+
+/**
+ * @desc    aggregate of glass of water per dat for week
+ * @route   DELETE - /api/v1/user/glass/aggregateGlassData
+ * @access  Private
+ * @note    workable later to evolve more
+ * 
+ */
+exports.aggregateGlassData = asyncHandler(async(req,res,next) => {
+
+    let { aggregateTemp, startDate, endDate } = req.body;
+    let aggregateFlag = {}
+
+    let todaystart = moment(new Date(startDate)).startOf('day');
+    let todayend = moment(new Date(endDate)).endOf('day');
+    
+
+    if(aggregateTemp == 'day'){
+        aggregateFlag = { $dayOfMonth : "$createdTime" }
+    }else if(aggregateTemp == 'week'){
+        aggregateFlag = { $week : "$createdTime" }
+    }else if(aggregateTemp == 'month'){
+        aggregateFlag = { $month : "$createdTime" }
+    }else if(aggregateTemp == 'year'){
+        aggregateFlag = { $year : "$createdTime" }
+    }
+
+    let aggregateData = await Glass.aggregate([
+        {
+            $match:{
+                userId:new ObjectId(req.user._id),
+                createdTime: { '$gte': new Date(todaystart), '$lte': new Date(todayend) },
+            }
+        },
+        {
+            $group : {
+                // _id :{ $dateToString: { format: "%Y-%m-%d", date: "$createdTime"} },
+                _id :aggregateFlag,
+                list: { $push: "$$ROOT" },
+                count: { $sum: 1 }
+             }
+        }
+    ])
+
+    res.status(200).json({
+        success:true,
+        message:"Glass aggregation Successfully",
+        body:aggregateData
+    })
+
+})

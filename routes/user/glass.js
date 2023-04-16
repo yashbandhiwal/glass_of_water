@@ -4,7 +4,8 @@ const {
     countup,
     listOfGlassDay,
     detail,
-    deleteGlass
+    deleteGlass,
+    aggregateGlassData
 } = require('../../controllers/user/glass');
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get('/countup', protect, countup);
 router.get('/list', protect, listOfGlassDay);
 router.post('/detail', protect, detail);
 router.delete('/delete', protect, deleteGlass);
+router.post('/aggregateGlassData',protect,aggregateGlassData)
 
 module.exports = router;
