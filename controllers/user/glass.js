@@ -39,3 +39,28 @@ exports.countup = asyncHandler(async(req,res,next) => {
     })
 
 })
+
+/**
+ * @desc    list of glass of water of day
+ * @route   GET - /api/v1/user/glass/list
+ * @access  Private
+ * @note
+ * 
+ */
+exports.listOfGlassDay = asyncHandler(async(req,res,next) => {
+    let todaystart = moment().startOf('day');
+    let todayend = moment(todaystart).endOf('day');
+
+    let glassFind = await Glass.find({
+        createdTime: { '$gte': todaystart, '$lte': todayend },
+        userId:new ObjectId(req.user._id)
+    })
+    .sort({createdTime:-1})
+
+    res.status(200).json({
+        success:true,
+        message:"Glass is counted up",
+        body:glassFind
+    })
+
+})
