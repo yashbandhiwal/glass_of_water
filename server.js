@@ -15,6 +15,8 @@ connectDB();
 
 // Route files
 const auth = require('./routes/auth');
+// user
+const glass = require('./routes/user/glass');
 
 const app = express();
 
@@ -34,6 +36,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
 app.use('/api/v1/auth',auth);
+//user mount
+app.use('/api/v1/users/glass',glass);
 
 app.use(errorHandler);
 
