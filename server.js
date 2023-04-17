@@ -17,6 +17,8 @@ connectDB();
 const auth = require('./routes/auth');
 // user
 const glass = require('./routes/user/glass');
+//admin
+const messageAdmin = require('./routes/admin/message')
 
 const app = express();
 
@@ -38,6 +40,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/auth',auth);
 //user mount
 app.use('/api/v1/users/glass',glass);
+//admin mount
+app.use('/api/v1/admin/message',messageAdmin)
 
 app.use(errorHandler);
 

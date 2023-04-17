@@ -11,6 +11,7 @@ const MessageSchema = new mongoose.Schema({
     },
     slag:{
         type:String,
+        unique:true,
         required:[true,'Please add Slag']
     },
     emoji:{
