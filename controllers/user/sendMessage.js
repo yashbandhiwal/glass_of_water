@@ -10,7 +10,7 @@ const User = require('../../models/User');
 
 /**
  * @desc    Create
- * @route   POST - /api/v1/admin/sendmessage/create
+ * @route   POST - /api/v1/admin/sendmessage/createMessage
  * @access  Private
  * @note
  */
@@ -26,12 +26,12 @@ exports.createMessage = asyncHandler(async(req,res,next) => {
     } = req.body
 
     let messageExist = await Message.findById(messageId)
-    if(messageExist){
+    if(!messageExist){
         return next(new ErrorResponse("Message Don't Exist", 404));
     }
 
     let receiverExist = await User.findById(receiverId)
-    if(receiverExist){
+    if(!receiverExist){
         return next(new ErrorResponse("Receiver Don't Exist", 404));
     }
 
@@ -49,6 +49,39 @@ exports.createMessage = asyncHandler(async(req,res,next) => {
         success:true,
         message:"Successfully created Message",
         body:create
+    })
+
+})
+
+
+/**
+ * @desc    seen
+ * @route   PUT - /api/v1/admin/sendmessage/seenUpdate
+ * @access  Private
+ * @note
+ */
+exports.seenUpdate = asyncHandler(async(req,res,next) => {
+
+    const {
+        sendMesssageId
+    } = req.body
+
+    let updateSeen = await SendMessage.findOneAndUpdate({
+        _id:new ObjectId(sendMesssageId),
+        receiverId:new ObjectId(req.user.id)
+    },{
+        $set:{
+            seen:true
+        }
+    },{
+        returnDocument:"after",
+        returnNewDocument : true  
+    })
+
+    res.status(201).json({
+        success:true,
+        message:"Successfully seen",
+        body:updateSeen
     })
 
 })

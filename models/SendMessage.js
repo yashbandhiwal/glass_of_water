@@ -11,9 +11,9 @@ const SendMessageSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    MesaageId:{
+    messageId:{
         type: mongoose.Schema.ObjectId,
-        ref: 'Message',
+        ref: 'messages',
         required: true
     },
     message:{
