@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const SendSchema = new mongoose.Schema({
+const SendMessageSchema = new mongoose.Schema({
     senderId:{
         type: mongoose.Schema.ObjectId,
         ref: 'User',
@@ -15,6 +15,23 @@ const SendSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Message',
         required: true
+    },
+    message:{
+        type: String,
+        required:false
+    },
+    title:{
+        type: String,
+        required:[true,'Please add Title']
+    },
+    slag:{
+        type:String,
+        unique:true,
+        required:[true,'Please add Slag']
+    },
+    emoji:{
+        type:String,
+        required:false
     },
     seen:{
         type:Boolean,
@@ -34,4 +51,4 @@ const SendSchema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('send',SendSchema)
+module.exports = mongoose.model('SendMessage',SendMessageSchema)
